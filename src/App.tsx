@@ -4,6 +4,7 @@ import { MOCK_WITNESSES } from './data/mockWitnesses';
 import type { CatastroData } from './lib/catastro';
 import { formatEUR, formatNum } from './lib/format';
 import { searchWitnesses } from './lib/search';
+import { parseWitnessCsv } from './lib/witnessImport';
 import { computeValuation, valuateWitness } from './lib/valuation';
 import type { FactorKey, FactorOverrides, Property, Tasador, ValuationSettings, Witness } from './types';
 import { PropertyForm } from './components/PropertyForm';
@@ -50,6 +51,7 @@ export default function App() {
   const [step, setStep] = useState<Step>('inmueble');
   const [showAdd, setShowAdd] = useState(false);
   const [rentMonthly, setRentMonthly] = useState(1100);
+  const [importMsg, setImportMsg] = useState('');
 
   const allWitnesses = useMemo(() => [...MOCK_WITNESSES, ...manual], [manual]);
   const pool = useMemo(() => allWitnesses.filter((w) => !discardedIds.has(w.id)), [allWitnesses, discardedIds]);
@@ -112,6 +114,21 @@ export default function App() {
   const goToWitnesses = () => {
     setSelectedIds(proposal(property, pool));
     setStep('testigos');
+  };
+
+  const importFile = async (file: File) => {
+    const text = await file.text();
+    const res = parseWitnessCsv(text, {
+      municipality: property.municipality,
+      lat: property.lat,
+      lng: property.lng,
+    });
+    if (res.witnesses.length > 0) {
+      setManual((prev) => [...prev, ...res.witnesses]);
+      setSelectedIds((prev) => new Set([...Array.from(prev), ...res.witnesses.map((w) => w.id)]));
+    }
+    const base = `${res.witnesses.length} testigo(s) importado(s) de "${file.name}".`;
+    setImportMsg(res.errors.length ? `${base} Filas descartadas: ${res.errors.join(' ')}` : base);
   };
 
   const addManual = (w: Witness) => {
@@ -210,6 +227,8 @@ export default function App() {
             onRestore={restore}
             onOverride={setOverride}
             onAddManual={() => setShowAdd(true)}
+            onImportFile={importFile}
+            importMessage={importMsg}
             onBack={() => setStep('inmueble')}
             onNext={() => setStep('valoracion')}
           />

@@ -27,6 +27,21 @@ npm run preview  # servir el build
 4. **Informe** – Documento estructurado en 5 apartados (identificación, características, testigos, valoración final,
    observaciones y firma). *Imprimir / Guardar como PDF* usa el diálogo de impresión del navegador.
 
+## Añadir testigos reales
+
+Hay dos vías:
+
+1. **A mano**: pantalla 2 (Testigos) → "+ Añadir testigo".
+2. **Importando un CSV**: pantalla 2 → "Importar CSV". Rellena una copia de
+   [plantillas/plantilla_testigos.csv](plantillas/plantilla_testigos.csv) (separador `;` o `,`).
+   Campos: `fuente` (notaria, interna, portal, manual), `referencia`, `direccion`, `zona`, `municipio`,
+   `latitud`, `longitud`, `superficie_m2`, `habitaciones`, `planta`, `ascensor` (si/no), `estado`
+   (reformar, bueno, excelente), `anio_construccion`, `orientacion` (N, NE, E, SE, S, SO, O, NO),
+   `garaje`, `trastero`, `aire_acondicionado` (si/no), `precio_eur`, `tipo_precio` (cerrado, oferta),
+   `fecha` (AAAA-MM-DD). Las filas con errores se descartan y la app indica cuáles.
+
+Las dos filas de ejemplo de la plantilla son ficticias: bórralas antes de importar datos reales.
+
 ## Motor de homogeneización (`src/lib/valuation.ts`)
 
 Cada testigo se convierte al €/m² del inmueble objeto multiplicando por coeficientes:

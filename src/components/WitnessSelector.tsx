@@ -19,6 +19,8 @@ interface Props {
   onRestore: (id: string) => void;
   onOverride: (id: string, key: FactorKey, value: number | undefined) => void;
   onAddManual: () => void;
+  onImportFile: (file: File) => void;
+  importMessage: string;
   onBack: () => void;
   onNext: () => void;
 }
@@ -70,12 +72,33 @@ export function WitnessSelector(props: Props) {
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => props.onSetSelection(candidates.map((c) => c.id))}>Seleccionar todos</Button>
             <Button onClick={() => props.onSetSelection([])}>Ninguno</Button>
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              Importar CSV
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) props.onImportFile(f);
+                  e.target.value = '';
+                }}
+              />
+            </label>
             <Button variant="primary" onClick={props.onAddManual}>
               + Añadir testigo
             </Button>
           </div>
         }
       >
+        {props.importMessage && (
+          <p className="mb-4 rounded-md bg-sky-50 px-3 py-2 text-sm text-sky-800">
+            {props.importMessage}{' '}
+            <span className="text-slate-600">
+              Plantilla: <code>plantillas/plantilla_testigos.csv</code>
+            </span>
+          </p>
+        )}
         <div className="mb-4 grid gap-3 md:grid-cols-4">
           <Field label="Buscar">
             <input
